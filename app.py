@@ -7,7 +7,7 @@ from flask import Flask, Response, render_template
 app = Flask(__name__)
 
 # Load YOLO model (ganti path sesuai dengan lokasi model kamu)
-model = YOLO('D:/project/sampah/best.pt')
+model = YOLO('./best.pt')
 
 # Generator frame dari webcam
 def generate_frames():
