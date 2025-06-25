@@ -1,16 +1,119 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Object Detection Web</title>
+    <meta charset="UTF-8">
+    <title>YOLOv8 Object Detection</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        video, img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+        }
+
+        .video-section,
+        .result-section {
+            flex: 1 1 45%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .label {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        canvas {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-  <h2>Realtime Object Detection</h2>
-  <video id="video" width="640" height="480" autoplay style="display: none;"></video>
-  <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
-  <div>
-    <img id="result" width="640" height="480"/>
-  </div>
+    <h2>Deteksi Objek YOLOv8</h2>
 
-  <script src="/static/script.js"></script>
+    <div class="controls">
+        <span><strong>Webcam Aktif</strong></span>
+        <button onclick="captureImage()">Ambil Gambar & Deteksi</button>
+    </div>
+
+    <div class="container">
+        <div class="video-section">
+            <video id="video" autoplay playsinline></video>
+            <div class="label">Tampilan Kamera</div>
+        </div>
+        <div class="result-section">
+            <img id="resultImage" alt="Hasil Deteksi">
+            <div class="label">Hasil Deteksi</div>
+        </div>
+    </div>
+
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const resultImage = document.getElementById('resultImage');
+
+        // Aktifkan webcam
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                alert("Tidak dapat mengakses kamera: " + err);
+            });
+
+        function captureImage() {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(blob => {
+                const formData = new FormData();
+                formData.append('image', blob, 'capture.jpg');
+
+                fetch('/detect', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    resultImage.src = data.image;
+                })
+                .catch(err => {
+                    alert("Gagal mengirim gambar: " + err);
+                });
+            }, 'image/jpeg');
+        }
+    </script>
 </body>
 </html>
