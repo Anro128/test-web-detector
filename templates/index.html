@@ -1,10 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Deteksi Sampah</title>
+  <title>Object Detection Web</title>
 </head>
-<body style="text-align:center">
-    <h1>Deteksi Sampah Realtime</h1>
-    <img src="/video" width="720">
+<body>
+  <h2>Realtime Object Detection</h2>
+  <video id="video" width="640" height="480" autoplay style="display: none;"></video>
+  <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+  <div>
+    <img id="result" width="640" height="480"/>
+  </div>
+
+  <script src="/static/script.js"></script>
 </body>
 </html>
